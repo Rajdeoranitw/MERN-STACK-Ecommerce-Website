@@ -1,6 +1,6 @@
 const app = require("./app");
-const connectDataBase = require("./config/database");
 const cloudinary = require("cloudinary");
+const mongoose = require("mongoose");
 
 // hnadleing uncought exception
 process.on("uncaughtException", err => {
@@ -17,20 +17,19 @@ if (process.env.NODE_ENV !== "PRODUCTION") {
 
 
 // connecting to database
-connectDataBase();
+mongoose.connect(process.env.DB_URI).then((data) => {
+    console.log(`mongodb connected with server: ${data.connection.host}`)
+    app.listen(process.env.PORT, () => {
+        console.log(`server is working on http://localhost:${process.env.PORT}`);
+    });
+}).catch(error => console.log(error));
+
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
-
-
-const server = app.listen(process.env.PORT, () => {
-    console.log(`server is working on http://localhost:${process.env.PORT}`);
-})
-
-
 
 // unhandled promise rejection
 process.on("unhandledRejection", err => {
